@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MapsApp</string>
+    <string name="my_list">Мой список</string>
+    <string name="map">Карта</string>
 </resources>
