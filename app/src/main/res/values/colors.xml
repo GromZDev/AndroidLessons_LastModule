@@ -17,4 +17,7 @@
 
     <color name="button_bg_end">#FFFD751B</color>
     <color name="button_bg_start">#F4A937</color>
+
+    <color name="recycler_remove_bg">#4D504D</color>
+    <color name="markers_rv_bg">#474646</color>
 </resources>

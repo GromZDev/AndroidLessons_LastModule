@@ -5,9 +5,8 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -27,6 +26,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import q4.mapsapp.databinding.FragmentMainMapsBinding
+import q4.mapsapp.model.Place
 
 class MainMapsFragment : Fragment() {
 
@@ -45,6 +45,7 @@ class MainMapsFragment : Fragment() {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private var markersList: MutableList<Marker> = mutableListOf()
     private var mapFragment: SupportMapFragment? = null
+    private var list: MutableList<Place> = mutableListOf()
 
     private val callback = OnMapReadyCallback { googleMap ->
         thisMap = googleMap
@@ -89,6 +90,8 @@ class MainMapsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        setHasOptionsMenu(true)
         setBottomSheetBehavior(binding.includedBottomSheetLayout.bottomSheetContainer)
         client = activity?.let { it1 -> LocationServices.getFusedLocationProviderClient(it1) }!!
         checkGPSPermission() // Запрашиваем все разрешения
@@ -112,6 +115,8 @@ class MainMapsFragment : Fragment() {
                 )
                 if (newMarker != null) {
                     markersList.add(newMarker)
+                    Log.i("TAG", newMarker.title.toString() + " !!!!!!!!!!!!")
+
                 }
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 Toast.makeText(context, "Маркер успешно установлен!", Toast.LENGTH_SHORT).show()
@@ -215,25 +220,56 @@ class MainMapsFragment : Fragment() {
     private fun setBottomSheetBehavior(bottomSheet: ConstraintLayout) {
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+    }
 
-//        bottomSheetBehavior.addBottomSheetCallback(object :
-//            BottomSheetBehavior.BottomSheetCallback() {
-//
-//            override fun onStateChanged(bottomSheet: View, newState: Int) {
-//
-//                when (newState) {
-//                    BottomSheetBehavior.STATE_HIDDEN -> {}
-//                    BottomSheetBehavior.STATE_COLLAPSED -> {}
-//                    BottomSheetBehavior.STATE_DRAGGING -> {}
-//                    BottomSheetBehavior.STATE_EXPANDED -> {}
-//                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {}
-//                    BottomSheetBehavior.STATE_SETTLING -> {}
-//                }
-//            }
-//
-//            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-//            }
-//        })
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.main_screen_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_show_list -> {
+                if (markersList.isEmpty()) {
+                    Toast.makeText(context, "Нет установленного маркера!", Toast.LENGTH_SHORT)
+                        .show()
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, MyListFragment.newInstance())
+                        .addToBackStack("")
+                        .commitAllowingStateLoss()
+                } else if (markersList.isNotEmpty()) {
+
+
+                    val places = markersList.map { marker ->
+                        Place(marker.title, marker.snippet)
+                    }
+                    val bundle = Bundle()
+                    list.addAll(places)
+                    bundle.putParcelableArrayList(
+                        MyListFragment.BUNDLE_EXTRA,
+                        list as java.util.ArrayList<Place>
+                    )
+
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, MyListFragment.newInstance(bundle))
+                        .addToBackStack("")
+                        .commitAllowingStateLoss()
+                }
+                true
+            }
+
+            R.id.menu_show_map -> {
+                parentFragmentManager.apply {
+                    beginTransaction()
+                        .replace(R.id.fragment_container, newInstance())
+                        .addToBackStack("")
+                        .commitAllowingStateLoss()
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
 }

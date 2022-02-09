@@ -5,4 +5,5 @@
     <string name="marker_title">Введите заголовок</string>
     <string name="marker_snippet">Введите описание маркера</string>
     <string name="setMarker">Установить маркер</string>
+    <string name="marker_list">Список моих маркеров:</string>
 </resources>
