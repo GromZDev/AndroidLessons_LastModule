@@ -1,7 +1,12 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_fragment_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
 <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/main_bg"
@@ -33,3 +38,9 @@
             tools:context=".view.maps.MapsFragment" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <include
+        android:id="@+id/includedBottomSheetLayout"
+        layout="@layout/bottom_sheet_layout" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

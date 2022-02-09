@@ -3,15 +3,15 @@ package q4.mapsapp
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.location.Address
-import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -21,16 +21,20 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.snackbar.Snackbar
 import q4.mapsapp.databinding.FragmentMainMapsBinding
-import java.util.*
 
-class MainMapsFragment: Fragment(R.layout.fragment_main_maps) {
+class MainMapsFragment : Fragment() {
 
     companion object {
         var PERMISSIONS = arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION)
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+
         fun newInstance() = MainMapsFragment()
     }
 
@@ -38,11 +42,23 @@ class MainMapsFragment: Fragment(R.layout.fragment_main_maps) {
     private val binding get() = _binding!!
 
     private lateinit var thisMap: GoogleMap
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private var markersList: MutableList<Marker> = mutableListOf()
+    private var mapFragment: SupportMapFragment? = null
 
     private val callback = OnMapReadyCallback { googleMap ->
         thisMap = googleMap
         activateMyLocation(thisMap)
         thisMap.uiSettings.isZoomControlsEnabled = true
+
+        thisMap.setOnMapLongClickListener { addMarker ->
+            showBottomSheetView(addMarker)
+        }
+
+        thisMap.setOnInfoWindowClickListener { deleteMarker ->
+            markersList.remove(deleteMarker)
+            deleteMarker.remove()
+        }
 
     }
 
@@ -65,13 +81,15 @@ class MainMapsFragment: Fragment(R.layout.fragment_main_maps) {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
+    ): View {
+        _binding = FragmentMainMapsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setBottomSheetBehavior(binding.includedBottomSheetLayout.bottomSheetContainer)
         client = activity?.let { it1 -> LocationServices.getFusedLocationProviderClient(it1) }!!
         checkGPSPermission() // Запрашиваем все разрешения
     }
@@ -79,6 +97,31 @@ class MainMapsFragment: Fragment(R.layout.fragment_main_maps) {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun showBottomSheetView(latLng: LatLng) {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        binding.includedBottomSheetLayout.addButton.setOnClickListener {
+            val snippet = binding.includedBottomSheetLayout.snippetEt.text.toString().trim()
+            val title = binding.includedBottomSheetLayout.titleEt.text.toString().trim()
+            if (snippet.isNotEmpty() && title.isNotEmpty()) {
+                val newMarker = thisMap.addMarker(
+                    MarkerOptions().position(latLng)
+                        .title(title).snippet(snippet)
+                )
+                if (newMarker != null) {
+                    markersList.add(newMarker)
+                }
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                Toast.makeText(context, "Маркер успешно установлен!", Toast.LENGTH_SHORT).show()
+                binding.includedBottomSheetLayout.snippetEt.text?.clear()
+                binding.includedBottomSheetLayout.titleEt.text?.clear()
+            } else if (snippet.isEmpty() || title.isEmpty()) {
+                Toast.makeText(context, "Что-то не заполнено!", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
     private fun activateMyLocation(googleMap: GoogleMap) {
@@ -104,9 +147,7 @@ class MainMapsFragment: Fragment(R.layout.fragment_main_maps) {
 
                     getMyCurrentLocation()
                     getMapData()
-
                 }
-                // Метод для нас, чтобы знали когда необходимы пояснения показывать перед запросом:
                 shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
                     AlertDialog.Builder(it)
                         .setTitle("Необходим доступ к GPS")
@@ -128,9 +169,22 @@ class MainMapsFragment: Fragment(R.layout.fragment_main_maps) {
         }
     }
 
+    private fun showHintSnackBar() {
+        mapFragment?.view?.let {
+            Snackbar.make(
+                it,
+                "Для установки маркера удерживайте точку долгим нажатием на карту!",
+                Snackbar.LENGTH_INDEFINITE
+            )
+                .setAction("Понял") {}
+                .show()
+        }
+    }
+
     private fun getMapData() {
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
+        showHintSnackBar()
     }
 
     @SuppressLint("MissingPermission")
@@ -156,6 +210,30 @@ class MainMapsFragment: Fragment(R.layout.fragment_main_maps) {
             .title("I am here bro!")
         thisMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 10f))
         thisMap.addMarker(options)
+    }
+
+    private fun setBottomSheetBehavior(bottomSheet: ConstraintLayout) {
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+//        bottomSheetBehavior.addBottomSheetCallback(object :
+//            BottomSheetBehavior.BottomSheetCallback() {
+//
+//            override fun onStateChanged(bottomSheet: View, newState: Int) {
+//
+//                when (newState) {
+//                    BottomSheetBehavior.STATE_HIDDEN -> {}
+//                    BottomSheetBehavior.STATE_COLLAPSED -> {}
+//                    BottomSheetBehavior.STATE_DRAGGING -> {}
+//                    BottomSheetBehavior.STATE_EXPANDED -> {}
+//                    BottomSheetBehavior.STATE_HALF_EXPANDED -> {}
+//                    BottomSheetBehavior.STATE_SETTLING -> {}
+//                }
+//            }
+//
+//            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+//            }
+//        })
     }
 
 }

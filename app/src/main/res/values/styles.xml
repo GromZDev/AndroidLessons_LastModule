@@ -1,0 +1,11 @@
+<resources>
+
+    <style name="My_Bottom_Sheet_Line">
+        <item name="android:layout_width">60dp</item>
+        <item name="android:layout_height">4dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:background">@color/bottom_sheet_line_background</item>
+    </style>
+
+
+</resources>
