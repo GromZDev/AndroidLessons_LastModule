@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import q4.mapsapp.databinding.ItemMarkersRvBinding
 import q4.mapsapp.model.Place
 
-class AllMarkersAdapter :
+class AllMarkersAdapter(
+    private var onItemViewClickListener: MyListFragment.OnItemViewClickListener?
+) :
     RecyclerView.Adapter<AllMarkersAdapter.AllMarkersViewHolder>(),
     ItemTouchHelperAdapter {
 
@@ -35,6 +37,12 @@ class AllMarkersAdapter :
         notifyDataSetChanged()
     }
 
+    fun setNewData(title: String, desc: String, position: Int) {
+        allMarkersList[position].title = title
+        allMarkersList[position].snippet = desc
+        notifyItemChanged(position)
+    }
+
     fun appendItem(markerData: Place) {
         allMarkersList.add(markerData)
         notifyItemInserted(itemCount - 1) // С анимацией добавления
@@ -49,7 +57,9 @@ class AllMarkersAdapter :
             vb.itemTitle.text = data.title
             vb.itemOverview.text = data.snippet
             //  vb.itemAddress.text = data.location
-
+            itemView.setOnClickListener {
+                onItemViewClickListener?.onMarkerItemViewClick(data, layoutPosition) // Вызываем слушатель нажатия
+            }
         }
 
         override fun onItemSelected() {
@@ -66,6 +76,10 @@ class AllMarkersAdapter :
     override fun onItemDismiss(position: Int) {
         allMarkersList.removeAt(position)
         notifyItemRemoved(position)
+    }
+
+    fun removeListener() {
+        onItemViewClickListener = null
     }
 
 }

@@ -2,6 +2,7 @@ package q4.mapsapp
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
@@ -27,6 +28,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
 import q4.mapsapp.databinding.FragmentMainMapsBinding
 import q4.mapsapp.model.Place
+import java.io.File
+import java.io.FileInputStream
+import java.io.ObjectInputStream
 
 class MainMapsFragment : Fragment() {
 
@@ -34,8 +38,13 @@ class MainMapsFragment : Fragment() {
         var PERMISSIONS = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION
         )
-
+        const val BUNDLE_EXTRA = "MY_List_Markers"
         fun newInstance() = MainMapsFragment()
+        fun newInstance(bundle: Bundle?): MainMapsFragment {
+            val fragment = MainMapsFragment()
+            fragment.arguments = bundle
+            return fragment
+        }
     }
 
     private var _binding: FragmentMainMapsBinding? = null
@@ -46,6 +55,7 @@ class MainMapsFragment : Fragment() {
     private var markersList: MutableList<Marker> = mutableListOf()
     private var mapFragment: SupportMapFragment? = null
     private var list: MutableList<Place> = mutableListOf()
+    private var placesFromList: MutableList<Place> = mutableListOf()
 
     private val callback = OnMapReadyCallback { googleMap ->
         thisMap = googleMap
@@ -60,6 +70,12 @@ class MainMapsFragment : Fragment() {
             markersList.remove(deleteMarker)
             deleteMarker.remove()
         }
+
+        if (markersList.isEmpty()) {
+            getSavedDataFromStorage()
+        }
+
+        getMyPlacesFromList()
 
     }
 
@@ -90,16 +106,85 @@ class MainMapsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         setHasOptionsMenu(true)
         setBottomSheetBehavior(binding.includedBottomSheetLayout.bottomSheetContainer)
         client = activity?.let { it1 -> LocationServices.getFusedLocationProviderClient(it1) }!!
-        checkGPSPermission() // Запрашиваем все разрешения
+        checkGPSPermission()
+
+        if (arguments !== null) {
+            placesFromList = arguments?.getParcelableArrayList(BUNDLE_EXTRA)!!
+            Log.i("TAG", "$placesFromList Получен в Главном <<<<<<<<<<<<<")
+        }
+        else if (arguments == null && placesFromList.isNullOrEmpty()) {
+            showHintSnackBar()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    /** Данные из хранилища ---------------- */
+    private fun getSavedDataFromStorage() {
+        val dataFromFile = context?.let { deserializeDataFromFile(it).toMutableList() }
+        if (dataFromFile != null) {
+
+            placesFromList.addAll(dataFromFile)
+
+            for (places in placesFromList) {
+                val latLng = places.location?.latitude?.let {
+                    places.location.longitude?.let { it1 ->
+                        LatLng(
+                            it,
+                            it1
+                        )
+                    }
+                }
+                latLng?.let {
+                    MarkerOptions().position(it)
+                        .title(places.title).snippet(places.snippet)
+                }?.let {
+                    thisMap.addMarker(
+                        it
+                    )
+                }
+            }
+        }
+    }
+
+    private fun getDataFromFile(context: Context): File {
+        return File(context.filesDir, FILENAME)
+    }
+
+    private fun deserializeDataFromFile(context: Context): MutableList<Place> {
+        val dataFile = getDataFromFile(context)
+        if (!dataFile.exists()) {
+            return mutableListOf()
+        }
+        ObjectInputStream(FileInputStream(dataFile)).use { return it.readObject() as MutableList<Place> }
+    }
+    /** ---------------------------- */
+
+    private fun getMyPlacesFromList() {
+        for (places in placesFromList) {
+            val latLng = places.location?.latitude?.let {
+                places.location.longitude?.let { it1 ->
+                    LatLng(
+                        it,
+                        it1
+                    )
+                }
+            }
+            latLng?.let {
+                MarkerOptions().position(it)
+                    .title(places.title).snippet(places.snippet)
+            }?.let {
+                thisMap.addMarker(
+                    it
+                )
+            }
+        }
     }
 
     private fun showBottomSheetView(latLng: LatLng) {
@@ -189,7 +274,6 @@ class MainMapsFragment : Fragment() {
     private fun getMapData() {
         mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(callback)
-        showHintSnackBar()
     }
 
     @SuppressLint("MissingPermission")
@@ -232,8 +316,6 @@ class MainMapsFragment : Fragment() {
         return when (item.itemId) {
             R.id.menu_show_list -> {
                 if (markersList.isEmpty()) {
-                    Toast.makeText(context, "Нет установленного маркера!", Toast.LENGTH_SHORT)
-                        .show()
                     parentFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, MyListFragment.newInstance())
                         .addToBackStack("")
@@ -242,7 +324,14 @@ class MainMapsFragment : Fragment() {
 
 
                     val places = markersList.map { marker ->
-                        Place(marker.title, marker.snippet)
+                        Place(
+                            marker.title,
+                            marker.snippet,
+                            q4.mapsapp.model.Location(
+                                marker.position.latitude,
+                                marker.position.longitude
+                            )
+                        )
                     }
                     val bundle = Bundle()
                     list.addAll(places)
