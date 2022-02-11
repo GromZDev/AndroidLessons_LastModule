@@ -1,19 +1,20 @@
-package q4.mapsapp
+package q4.mapsapp.ui.mainMaps
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -26,13 +27,16 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.snackbar.Snackbar
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import q4.mapsapp.BaseFragment
+import q4.mapsapp.R
+import q4.mapsapp.appState.MainMapsAppState
 import q4.mapsapp.databinding.FragmentMainMapsBinding
 import q4.mapsapp.model.Place
-import java.io.File
-import java.io.FileInputStream
-import java.io.ObjectInputStream
+import q4.mapsapp.ui.markerList.MyListFragment
 
-class MainMapsFragment : Fragment() {
+class MainMapsFragment(override val layoutId: Int = R.layout.fragment_main_maps) :
+    BaseFragment<FragmentMainMapsBinding>() {
 
     companion object {
         var PERMISSIONS = arrayOf(
@@ -47,15 +51,13 @@ class MainMapsFragment : Fragment() {
         }
     }
 
-    private var _binding: FragmentMainMapsBinding? = null
-    private val binding get() = _binding!!
-
     private lateinit var thisMap: GoogleMap
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private var markersList: MutableList<Marker> = mutableListOf()
     private var mapFragment: SupportMapFragment? = null
     private var list: MutableList<Place> = mutableListOf()
     private var placesFromList: MutableList<Place> = mutableListOf()
+    private val viewModel by viewModel<MainMapsViewModel>()
 
     private val callback = OnMapReadyCallback { googleMap ->
         thisMap = googleMap
@@ -72,7 +74,7 @@ class MainMapsFragment : Fragment() {
         }
 
         if (markersList.isEmpty()) {
-            getSavedDataFromStorage()
+            getSavedDataFromStorage(placesFromList)
         }
 
         getMyPlacesFromList()
@@ -94,54 +96,49 @@ class MainMapsFragment : Fragment() {
 
     private lateinit var client: FusedLocationProviderClient
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentMainMapsBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setHasOptionsMenu(true)
-        setBottomSheetBehavior(binding.includedBottomSheetLayout.bottomSheetContainer)
+        binding?.includedBottomSheetLayout?.bottomSheetContainer?.let { setBottomSheetBehavior(it) }
         client = activity?.let { it1 -> LocationServices.getFusedLocationProviderClient(it1) }!!
         checkGPSPermission()
 
         if (arguments !== null) {
             placesFromList = arguments?.getParcelableArrayList(BUNDLE_EXTRA)!!
             Log.i("TAG", "$placesFromList Получен в Главном <<<<<<<<<<<<<")
-        }
-        else if (arguments == null && placesFromList.isNullOrEmpty()) {
+        } else if (arguments == null && placesFromList.isNullOrEmpty()) {
             showHintSnackBar()
         }
+
+        viewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
+        viewModel.getMarkersData()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun renderData(appState: MainMapsAppState) {
+        when (appState) {
+            is MainMapsAppState.Success -> {
+
+                binding?.includedLoadingLayout?.loadingLayout?.visibility = View.GONE
+                getSavedDataFromStorage(appState.markersData)
+            }
+            is MainMapsAppState.Loading -> {
+                binding?.includedLoadingLayout?.loadingLayout?.visibility = View.VISIBLE
+
+            }
+            is MainMapsAppState.Error -> {
+
+            }
+        }
     }
 
     /** Данные из хранилища ---------------- */
-    private fun getSavedDataFromStorage() {
-        val dataFromFile = context?.let { deserializeDataFromFile(it).toMutableList() }
-        if (dataFromFile != null) {
+    private fun getSavedDataFromStorage(appState: List<Place>) {
 
-            placesFromList.addAll(dataFromFile)
-
-            for (places in placesFromList) {
-                val latLng = places.location?.latitude?.let {
-                    places.location.longitude?.let { it1 ->
-                        LatLng(
-                            it,
-                            it1
-                        )
-                    }
-                }
-                latLng?.let {
+        placesFromList.addAll(appState)
+        for (places in placesFromList) {
+            viewModel.getLatLn(places).apply {
+                this?.let {
                     MarkerOptions().position(it)
                         .title(places.title).snippet(places.snippet)
                 }?.let {
@@ -153,36 +150,18 @@ class MainMapsFragment : Fragment() {
         }
     }
 
-    private fun getDataFromFile(context: Context): File {
-        return File(context.filesDir, FILENAME)
-    }
-
-    private fun deserializeDataFromFile(context: Context): MutableList<Place> {
-        val dataFile = getDataFromFile(context)
-        if (!dataFile.exists()) {
-            return mutableListOf()
-        }
-        ObjectInputStream(FileInputStream(dataFile)).use { return it.readObject() as MutableList<Place> }
-    }
-    /** ---------------------------- */
-
+    /** --------------------------------------- */
     private fun getMyPlacesFromList() {
         for (places in placesFromList) {
-            val latLng = places.location?.latitude?.let {
-                places.location.longitude?.let { it1 ->
-                    LatLng(
-                        it,
-                        it1
+            viewModel.getLatLn(places).apply {
+                this?.let {
+                    MarkerOptions().position(it)
+                        .title(places.title).snippet(places.snippet)
+                }?.let {
+                    thisMap.addMarker(
+                        it
                     )
                 }
-            }
-            latLng?.let {
-                MarkerOptions().position(it)
-                    .title(places.title).snippet(places.snippet)
-            }?.let {
-                thisMap.addMarker(
-                    it
-                )
             }
         }
     }
@@ -190,9 +169,9 @@ class MainMapsFragment : Fragment() {
     private fun showBottomSheetView(latLng: LatLng) {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
 
-        binding.includedBottomSheetLayout.addButton.setOnClickListener {
-            val snippet = binding.includedBottomSheetLayout.snippetEt.text.toString().trim()
-            val title = binding.includedBottomSheetLayout.titleEt.text.toString().trim()
+        binding?.includedBottomSheetLayout?.addButton?.setOnClickListener {
+            val snippet = binding!!.includedBottomSheetLayout.snippetEt.text.toString().trim()
+            val title = binding!!.includedBottomSheetLayout.titleEt.text.toString().trim()
             if (snippet.isNotEmpty() && title.isNotEmpty()) {
                 val newMarker = thisMap.addMarker(
                     MarkerOptions().position(latLng)
@@ -205,8 +184,8 @@ class MainMapsFragment : Fragment() {
                 }
                 bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 Toast.makeText(context, "Маркер успешно установлен!", Toast.LENGTH_SHORT).show()
-                binding.includedBottomSheetLayout.snippetEt.text?.clear()
-                binding.includedBottomSheetLayout.titleEt.text?.clear()
+                binding!!.includedBottomSheetLayout.snippetEt.text?.clear()
+                binding!!.includedBottomSheetLayout.titleEt.text?.clear()
             } else if (snippet.isEmpty() || title.isEmpty()) {
                 Toast.makeText(context, "Что-то не заполнено!", Toast.LENGTH_SHORT).show()
             }
@@ -322,28 +301,19 @@ class MainMapsFragment : Fragment() {
                         .commitAllowingStateLoss()
                 } else if (markersList.isNotEmpty()) {
 
+             viewModel.makeBundleAndGoToListFragment(markersList).apply {
+                 val bundle = Bundle()
+                 bundle.putParcelableArrayList(
+                     MyListFragment.BUNDLE_EXTRA,
+                     this as java.util.ArrayList<Place>
+                 )
 
-                    val places = markersList.map { marker ->
-                        Place(
-                            marker.title,
-                            marker.snippet,
-                            q4.mapsapp.model.Location(
-                                marker.position.latitude,
-                                marker.position.longitude
-                            )
-                        )
-                    }
-                    val bundle = Bundle()
-                    list.addAll(places)
-                    bundle.putParcelableArrayList(
-                        MyListFragment.BUNDLE_EXTRA,
-                        list as java.util.ArrayList<Place>
-                    )
+                 parentFragmentManager.beginTransaction()
+                     .replace(R.id.fragment_container, MyListFragment.newInstance(bundle))
+                     .addToBackStack("")
+                     .commitAllowingStateLoss()
+             }
 
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, MyListFragment.newInstance(bundle))
-                        .addToBackStack("")
-                        .commitAllowingStateLoss()
                 }
                 true
             }

@@ -1,30 +1,34 @@
-package q4.mapsapp
+package q4.mapsapp.ui.markerList
 
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import q4.mapsapp.BaseFragment
+import q4.mapsapp.R
 import q4.mapsapp.databinding.FragmentMyListBinding
 import q4.mapsapp.model.Location
 import q4.mapsapp.model.Place
+import q4.mapsapp.ui.MarkerDetailFragment
+import q4.mapsapp.ui.mainMaps.MainMapsFragment
 import java.io.*
 
 const val FILENAME = "MyPlacesList.data"
 
-class MyListFragment : Fragment() {
+class MyListFragment(override val layoutId: Int = R.layout.fragment_my_list) :
+    BaseFragment<FragmentMyListBinding>() {
 
     private lateinit var markersList: MutableList<Place>
     private lateinit var markersAdapter: AllMarkersAdapter
     private lateinit var recyclerView: RecyclerView
     private var allMarkersInRvList: MutableList<Place> = mutableListOf()
-
-    private var _binding: FragmentMyListBinding? = null
-    private val binding get() = _binding!!
 
     companion object {
         const val BUNDLE_EXTRA = "MY_Markers"
@@ -41,21 +45,12 @@ class MyListFragment : Fragment() {
         fun onMarkerItemViewClick(place: Place, position: Int)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentMyListBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setHasOptionsMenu(true)
-        // rv set
-        recyclerView = binding.markersListRv
+
+        recyclerView = binding?.markersListRv!!
         recyclerView.layoutManager = LinearLayoutManager(
             context,
             LinearLayoutManager.VERTICAL,
@@ -67,8 +62,12 @@ class MyListFragment : Fragment() {
             override fun onMarkerItemViewClick(place: Place, position: Int) {
                 val manager = activity?.supportFragmentManager
                 manager?.let {
-                    val placeToDetails = Place(place.title, place.snippet,
-                        Location(place.location?.latitude, place.location?.longitude), position = position)
+                    val placeToDetails = Place(
+                        place.title,
+                        place.snippet,
+                        Location(place.location?.latitude, place.location?.longitude),
+                        position = position
+                    )
                     val bundle = Bundle()
                     bundle.putParcelable(MarkerDetailFragment.BUNDLE_EXTRA, placeToDetails)
                     manager.beginTransaction()
@@ -105,14 +104,17 @@ class MyListFragment : Fragment() {
             Log.i("TAG", b?.toString() + " Получены Измененные данные!!!!!!!!!!!!")
 
             if (b != null) {
-                b.title?.let { b.snippet?.let { it1 ->
-                    b.position?.let { it2 ->
-                        markersAdapter.setNewData(it,
-                            it1, it2
-                        )
-                        markersAdapter.notifyItemChanged(it2)
+                b.title?.let {
+                    b.snippet?.let { it1 ->
+                        b.position?.let { it2 ->
+                            markersAdapter.setNewData(
+                                it,
+                                it1, it2
+                            )
+                            markersAdapter.notifyItemChanged(it2)
+                        }
                     }
-                } }
+                }
             }
         }
 
@@ -147,11 +149,6 @@ class MyListFragment : Fragment() {
             markersAdapter.setAllMarkersData(markersList)
         }
         /** */
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun onDestroy() {

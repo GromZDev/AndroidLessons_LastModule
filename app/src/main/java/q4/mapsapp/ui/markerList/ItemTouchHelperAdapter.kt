@@ -1,4 +1,4 @@
-package q4.mapsapp
+package q4.mapsapp.ui.markerList
 
 interface ItemTouchHelperAdapter {
     fun onItemMove(fromPosition: Int, toPosition: Int)

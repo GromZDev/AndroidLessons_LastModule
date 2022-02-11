@@ -1,4 +1,4 @@
-package q4.mapsapp
+package q4.mapsapp.ui
 
 import android.location.Address
 import android.location.Geocoder
@@ -12,8 +12,10 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import q4.mapsapp.R
 import q4.mapsapp.databinding.FragmentMarkerDetailsBinding
 import q4.mapsapp.model.Place
+import q4.mapsapp.ui.markerList.MyListFragment
 import java.util.*
 
 class MarkerDetailFragment : Fragment() {

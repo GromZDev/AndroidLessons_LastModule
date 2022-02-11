@@ -20,4 +20,6 @@
 
     <color name="recycler_remove_bg">#4D504D</color>
     <color name="markers_rv_bg">#474646</color>
+
+    <color name="alfa_main_bg">#400D0D0D</color>
 </resources>

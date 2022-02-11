@@ -2,6 +2,7 @@ package q4.mapsapp
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import q4.mapsapp.ui.mainMaps.MainMapsFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

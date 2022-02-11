@@ -1,9 +1,10 @@
-package q4.mapsapp
+package q4.mapsapp.ui.markerList
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import q4.mapsapp.R
 import q4.mapsapp.databinding.ItemMarkersRvBinding
 import q4.mapsapp.model.Place
 
