@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_show_list"
+        android:icon="@drawable/ic_show_list"
+        android:enabled="true"
+        android:title="@string/my_list"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_show_map"
+        android:enabled="true"
+        android:icon="@drawable/ic_map"
+        android:title="@string/map"
+        app:showAsAction="ifRoom" />
+
+</menu>

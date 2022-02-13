@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">MapsApp</string>
+    <string name="my_list">Мой список</string>
+    <string name="map">Карта</string>
+    <string name="marker_title">Введите заголовок</string>
+    <string name="marker_snippet">Введите описание маркера</string>
+    <string name="setMarker">Установить маркер</string>
+    <string name="marker_list">Список моих маркеров:</string>
+    <string name="location">Местоположение:</string>
+    <string name="change_data">Поменяйте необходимые данные маркера</string>
+    <string name="save_data">Сохранить</string>
+    <string name="edit">Редактировать</string>
 </resources>

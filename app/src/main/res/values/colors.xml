@@ -7,4 +7,19 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="main_bg">#0D0D0D</color>
+    <color name="bottom_sheet_bg">#5E5E5E</color>
+    <color name="bottom_sheet_line_background">#662D3139</color>
+    <color name="main_button_bg">#272727</color>
+    <color name="bottom_sheet_form_color">#FD751B</color>
+    <color name="hint_text_color">#6C6E6C</color>
+
+    <color name="button_bg_end">#FFFD751B</color>
+    <color name="button_bg_start">#F4A937</color>
+
+    <color name="recycler_remove_bg">#4D504D</color>
+    <color name="markers_rv_bg">#474646</color>
+
+    <color name="alfa_main_bg">#400D0D0D</color>
 </resources>
