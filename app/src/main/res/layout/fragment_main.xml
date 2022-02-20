@@ -79,16 +79,51 @@
         app:layout_constraintStart_toStartOf="@+id/timeWatch"
         app:layout_constraintTop_toTopOf="@+id/days_tw"/>
 
-    <Button
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnDatePicker"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="32dp"
+        android:layout_margin="8dp"
+        android:src="@android:drawable/ic_input_add"
+        app:fabCustomSize="52dp"
+        app:tint="@color/white"
         android:text="@string/set_data"
         android:textColor="#fff"
+        app:layout_constraintEnd_toEndOf="@+id/timeWatch"
+        app:layout_constraintTop_toTopOf="@+id/timeWatch"
+        android:contentDescription="@string/fab" />
+
+    <TextView
+        android:id="@+id/lessons_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/lessons_today"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timeWatch" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/lessons_rv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:clipToPadding="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timeWatch"/>
+        app:layout_constraintTop_toBottomOf="@+id/lessons_textview" />
+
+    <include
+        android:id="@+id/includedLoadingLayout"
+        layout="@layout/loading_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/alfa_main_bg"
+        android:layout_marginTop="56dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lessons_textview" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

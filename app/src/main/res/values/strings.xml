@@ -5,4 +5,7 @@
     <string name="set_data">Установить дату</string>
     <string name="main">Главная</string>
     <string name="lessons">Уроки</string>
+    <string name="fab">FAB</string>
+    <string name="lessons_today">Уроки</string>
+    <string name="foto">Фото</string>
 </resources>

@@ -14,5 +14,6 @@
     <color name="countdown_background_start">#38f188</color>
     <color name="countdown_background_end">#08c2b3</color>
     <color name="alfa_main_bg">#400D0D0D</color>
+    <color name="time_text_color">#6C6E6C</color>
 
 </resources>
