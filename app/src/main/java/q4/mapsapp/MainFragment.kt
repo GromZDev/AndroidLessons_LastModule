@@ -10,13 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.Toast
-import androidx.core.util.rangeTo
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import q4.mapsapp.data.Homework
 import q4.mapsapp.data.Lessons
 import q4.mapsapp.databinding.FragmentMainBinding
+import q4.mapsapp.ui.HomeworkAdapter
 import q4.mapsapp.ui.MainFragmentAppState
 import q4.mapsapp.ui.MainFragmentViewModel
 import q4.mapsapp.ui.MainLessonsAdapter
@@ -66,19 +67,29 @@ class MainFragment : Fragment() {
             is MainFragmentAppState.Success -> {
                 binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 binding.lessonsRv.visibility = View.VISIBLE
-                setLessonsData(appState.lessonsData)
+                binding.homeworksRv.visibility = View.VISIBLE
+                binding.lessonsTextview.visibility = View.VISIBLE
+                binding.homeworkTextview.visibility = View.VISIBLE
+                setLessonsData(appState.lessonsData, appState.homeworkData)
             }
             is MainFragmentAppState.Loading -> {
                 binding.includedLoadingLayout.loadingLayout.visibility = View.VISIBLE
                 binding.lessonsRv.visibility = View.GONE
+                binding.homeworksRv.visibility = View.GONE
+                binding.lessonsTextview.visibility = View.GONE
+                binding.homeworkTextview.visibility = View.GONE
             }
             is MainFragmentAppState.Error -> {
                 binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
+                binding.lessonsRv.visibility = View.VISIBLE
+                binding.homeworksRv.visibility = View.VISIBLE
+                binding.lessonsTextview.visibility = View.VISIBLE
+                binding.homeworkTextview.visibility = View.VISIBLE
             }
         }
     }
 
-    private fun setLessonsData(list: List<Lessons>) {
+    private fun setLessonsData(lessons: List<Lessons>, homework: List<Homework>) {
         val allLessons: RecyclerView = binding.lessonsRv
         allLessons.layoutManager = LinearLayoutManager(
             context,
@@ -87,17 +98,29 @@ class MainFragment : Fragment() {
         )
         val lessonsRecyclerAdapter = MainLessonsAdapter()
         allLessons.adapter = lessonsRecyclerAdapter
-        lessonsRecyclerAdapter.setLessons(list)
-        for (doc in list) {
-            if (doc.time.toDouble() <= getCurrentTime().toDouble()){
+        lessonsRecyclerAdapter.setLessons(lessons)
+        for (doc in lessons) {
+            if (doc.time.toDouble() <= getCurrentTime().toDouble()) {
                 allLessons.scrollToPosition(doc.id)
             }
             /** Проверка
             if (doc.time.toDouble() <= 11.35){
-                allLessons.scrollToPosition(doc.id)
+            allLessons.scrollToPosition(doc.id)
             }
-            */
+             */
         }
+
+
+        val allHomeworks: RecyclerView = binding.homeworksRv
+        allHomeworks.layoutManager = LinearLayoutManager(
+            context,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
+        val homeworkAdapter = HomeworkAdapter()
+        allHomeworks.adapter = homeworkAdapter
+        homeworkAdapter.setHomeworks(homework)
+
     }
 
     private fun setListener() =

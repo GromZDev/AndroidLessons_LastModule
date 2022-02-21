@@ -1,4 +1,4 @@
-package q4.mapsapp.repository
+package q4.mapsapp.repository.lessons
 
 import q4.mapsapp.data.Lessons
 

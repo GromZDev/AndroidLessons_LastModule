@@ -1,0 +1,69 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_film_container_rv_vertical"
+    style="@style/LessonsRecyclerItem"
+    android:layout_width="220dp"
+    android:layout_height="180dp"
+    android:gravity="center"
+    android:padding="8dp">
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/item_homework_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/item_homework_text"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Математика" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/item_image"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="12dp"
+        app:shapeAppearanceOverlay="@style/ItemRounded"
+        android:contentDescription="@string/item_img"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/item_homework_time_tw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/time_text_color"
+        android:textSize="12sp"
+        android:text="@string/days_left"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/item_homework_name" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/item_homework_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@+id/item_homework_time_tw"
+        app:layout_constraintTop_toBottomOf="@+id/item_homework_name"
+        tools:text="3" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/item_homework_overview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/item_homework_time"
+        tools:text="Сделать задание 433-440" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

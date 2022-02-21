@@ -2,14 +2,17 @@ package q4.mapsapp.ui
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import q4.mapsapp.repository.LessonsRepository
-import q4.mapsapp.repository.LessonsRepositoryImpl
+import q4.mapsapp.repository.homework.HomeworkRepository
+import q4.mapsapp.repository.homework.HomeworkRepositoryImpl
+import q4.mapsapp.repository.lessons.LessonsRepository
+import q4.mapsapp.repository.lessons.LessonsRepositoryImpl
 import java.lang.Thread.sleep
 
 class MainFragmentViewModel(
     private val liveDataToObserve: MutableLiveData<MainFragmentAppState> =
         MutableLiveData(),
-    private val repositoryImpl: LessonsRepository = LessonsRepositoryImpl()
+    private val lessonsRepositoryImpl: LessonsRepository = LessonsRepositoryImpl(),
+    private val homeworksRepositoryImpl: HomeworkRepository = HomeworkRepositoryImpl()
 ) : ViewModel() {
 
     fun getLiveData() = liveDataToObserve
@@ -23,7 +26,8 @@ class MainFragmentViewModel(
             sleep(700)
             liveDataToObserve.postValue(
                 MainFragmentAppState.Success(
-                    repositoryImpl.getLessons()
+                    lessonsRepositoryImpl.getLessons(),
+                    homeworksRepositoryImpl.getHomework()
                 )
             )
         }.start()

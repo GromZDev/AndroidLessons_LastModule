@@ -8,4 +8,9 @@
     <string name="fab">FAB</string>
     <string name="lessons_today">Уроки</string>
     <string name="foto">Фото</string>
+    <string name="homework">Домашнее задание</string>
+    <string name="days_left">Дней осталось:</string>
+    <string name="item_img">Фото</string>
+    <string name="item_open_in">Открыть</string>
+    <string name="open_in">Открыть</string>
 </resources>

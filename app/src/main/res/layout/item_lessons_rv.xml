@@ -5,8 +5,7 @@
     style="@style/LessonsRecyclerItem"
     android:layout_width="match_parent"
     android:layout_height="110dp"
-    android:gravity="center"
-    android:padding="8dp">
+    android:gravity="center">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/item_image"
@@ -14,6 +13,7 @@
         android:layout_height="80dp"
         app:shapeAppearanceOverlay="@style/ItemRounded"
         android:contentDescription="@string/foto"
+        android:layout_marginStart="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -27,7 +27,7 @@
         android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintBottom_toTopOf="@+id/item_time"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/item_open_in"
         app:layout_constraintStart_toEndOf="@+id/item_image"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Математика" />
@@ -41,9 +41,46 @@
         android:textColor="@color/time_text_color"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/item_open_in"
         app:layout_constraintStart_toEndOf="@+id/item_image"
         app:layout_constraintTop_toBottomOf="@+id/item_name"
         tools:text="8.30 - 9.15" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/item_open_in"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:background="@drawable/item_lessons_right_side_bg"
+        android:contentDescription="@string/item_open_in"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/item_open_in_tw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:rotation="90"
+        android:text="@string/open_in"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/item_video_open_in"
+        app:layout_constraintEnd_toEndOf="@+id/item_open_in"
+        app:layout_constraintStart_toStartOf="@+id/item_open_in"
+        app:layout_constraintTop_toTopOf="@+id/item_open_in" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/item_video_open_in"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_video_call"
+        android:rotation="90"
+        android:layout_marginTop="12dp"
+        android:contentDescription="@string/item_open_in"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/item_open_in_tw"
+        app:layout_constraintStart_toStartOf="@+id/item_open_in"
+        app:layout_constraintTop_toBottomOf="@+id/item_open_in_tw" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
