@@ -4,6 +4,7 @@ import android.R
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,14 +18,14 @@ import androidx.recyclerview.widget.RecyclerView
 import q4.mapsapp.data.Homework
 import q4.mapsapp.data.Lessons
 import q4.mapsapp.databinding.FragmentMainBinding
-import q4.mapsapp.ui.HomeworkAdapter
-import q4.mapsapp.ui.MainFragmentAppState
-import q4.mapsapp.ui.MainFragmentViewModel
-import q4.mapsapp.ui.MainLessonsAdapter
+import q4.mapsapp.ui.lessons.LessonsFragment
+import q4.mapsapp.ui.main.HomeworkAdapter
+import q4.mapsapp.ui.main.MainFragmentAppState
+import q4.mapsapp.ui.main.MainLessonsAdapter
+import q4.mapsapp.viewModel.MainFragmentViewModel
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-
 
 class MainFragment : Fragment() {
 
@@ -96,7 +97,16 @@ class MainFragment : Fragment() {
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        val lessonsRecyclerAdapter = MainLessonsAdapter()
+        val lessonsRecyclerAdapter = MainLessonsAdapter(object :
+            LessonsFragment.OnItemViewClickListener {
+            override fun onItemViewClick() {
+                val intent: Intent? =
+                    activity?.packageManager?.getLaunchIntentForPackage("com.whatsapp")
+                if (intent != null) {
+                    startActivity(intent)
+                }
+            }
+        })
         allLessons.adapter = lessonsRecyclerAdapter
         lessonsRecyclerAdapter.setLessons(lessons)
         for (doc in lessons) {

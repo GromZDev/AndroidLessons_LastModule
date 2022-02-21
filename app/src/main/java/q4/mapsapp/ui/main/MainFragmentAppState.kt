@@ -1,4 +1,4 @@
-package q4.mapsapp.ui
+package q4.mapsapp.ui.main
 
 import q4.mapsapp.data.Homework
 import q4.mapsapp.data.Lessons
