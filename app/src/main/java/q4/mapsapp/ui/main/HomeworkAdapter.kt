@@ -1,4 +1,4 @@
-package q4.mapsapp.ui
+package q4.mapsapp.ui.main
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

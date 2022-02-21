@@ -4,6 +4,7 @@ import android.R
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,14 +18,16 @@ import androidx.recyclerview.widget.RecyclerView
 import q4.mapsapp.data.Homework
 import q4.mapsapp.data.Lessons
 import q4.mapsapp.databinding.FragmentMainBinding
-import q4.mapsapp.ui.HomeworkAdapter
-import q4.mapsapp.ui.MainFragmentAppState
-import q4.mapsapp.ui.MainFragmentViewModel
-import q4.mapsapp.ui.MainLessonsAdapter
+import q4.mapsapp.ui.lessons.LessonsFragment
+import q4.mapsapp.ui.main.HomeworkAdapter
+import q4.mapsapp.ui.main.MainFragmentAppState
+import q4.mapsapp.ui.main.MainLessonsAdapter
+import q4.mapsapp.ui.main.TimerAppState
+import q4.mapsapp.viewModel.MainFragmentViewModel
+import q4.mapsapp.viewModel.TimerViewModel
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
-
 
 class MainFragment : Fragment() {
 
@@ -37,6 +40,9 @@ class MainFragment : Fragment() {
     private var dateSetListener: OnDateSetListener? = null
     private val mainLessonsViewModel: MainFragmentViewModel by lazy {
         ViewModelProvider(this).get(MainFragmentViewModel::class.java)
+    }
+    private val timerViewModel: TimerViewModel by lazy {
+        ViewModelProvider(this).get(TimerViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -52,6 +58,7 @@ class MainFragment : Fragment() {
 
         mainLessonsViewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
         mainLessonsViewModel.getLessonsFromLocal()
+        timerViewModel.getLiveData().observe(viewLifecycleOwner, {timerData(it)})
 
         binding.btnDatePicker.setOnClickListener {
             dateSetListener = setListener()
@@ -89,6 +96,33 @@ class MainFragment : Fragment() {
         }
     }
 
+    private fun timerData(appState: TimerAppState) {
+        when (appState) {
+            is TimerAppState.Success -> {
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
+                setTimerData(appState.timerData)
+            }
+            is TimerAppState.Loading -> {
+                binding.includedLoadingLayout.loadingLayout.visibility = View.VISIBLE
+
+            }
+            is TimerAppState.Error -> {
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
+
+            }
+        }
+    }
+
+    private fun setTimerData(timer: Long) {
+//        val pickerDateString: String =
+//            DateFormat.getDateInstance(DateFormat.FULL).format(calendar.time)
+
+        val tvDatePicker = binding.datePickerTw
+        val myCountdownView = binding.countdown
+
+            myCountdownView.start(timer)
+    }
+
     private fun setLessonsData(lessons: List<Lessons>, homework: List<Homework>) {
         val allLessons: RecyclerView = binding.lessonsRv
         allLessons.layoutManager = LinearLayoutManager(
@@ -96,7 +130,16 @@ class MainFragment : Fragment() {
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        val lessonsRecyclerAdapter = MainLessonsAdapter()
+        val lessonsRecyclerAdapter = MainLessonsAdapter(object :
+            LessonsFragment.OnItemViewClickListener {
+            override fun onItemViewClick() {
+                val intent: Intent? =
+                    activity?.packageManager?.getLaunchIntentForPackage("com.whatsapp")
+                if (intent != null) {
+                    startActivity(intent)
+                }
+            }
+        })
         allLessons.adapter = lessonsRecyclerAdapter
         lessonsRecyclerAdapter.setLessons(lessons)
         for (doc in lessons) {
@@ -129,23 +172,24 @@ class MainFragment : Fragment() {
             calendar.set(Calendar.YEAR, year)
             calendar.set(Calendar.MONTH, month)
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-            val pickerDateString: String =
-                DateFormat.getDateInstance(DateFormat.FULL).format(calendar.time)
-
-            val tvDatePicker = binding.datePickerTw
-            val myCountdownView = binding.countdown
-            try {
-                Toast.makeText(context, "Таймер установлен!", Toast.LENGTH_SHORT).show()
-                tvDatePicker.text = pickerDateString
-                val now = Date()
-                val currentDate: Long = now.time
-                val pickerDate: Long = calendar.timeInMillis
-                val countDownToPickerDate = pickerDate - currentDate
-                myCountdownView.start(countDownToPickerDate)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(context, "Ошибка!!!!", Toast.LENGTH_SHORT).show()
-            }
+            timerViewModel.getTimerData(year, month, dayOfMonth)
+//            val pickerDateString: String =
+//                DateFormat.getDateInstance(DateFormat.FULL).format(calendar.time)
+//
+//            val tvDatePicker = binding.datePickerTw
+//            val myCountdownView = binding.countdown
+//            try {
+//                Toast.makeText(context, "Таймер установлен!", Toast.LENGTH_SHORT).show()
+//                tvDatePicker.text = pickerDateString
+//                val now = Date()
+//                val currentDate: Long = now.time
+//                val pickerDate: Long = calendar.timeInMillis
+//                val countDownToPickerDate = pickerDate - currentDate
+//                myCountdownView.start(countDownToPickerDate)
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                Toast.makeText(context, "Ошибка!!!!", Toast.LENGTH_SHORT).show()
+//            }
         }
 
     private fun initDialog(): DatePickerDialog {
