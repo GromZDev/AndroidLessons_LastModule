@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import q4.mapsapp.R
 import q4.mapsapp.data.Lessons
 import q4.mapsapp.databinding.FragmentLessonsBinding
-import q4.mapsapp.ui.main.MainLessonsAdapter
 import q4.mapsapp.viewModel.LessonsFragmentViewModel
 
 class LessonsFragment : Fragment(R.layout.fragment_lessons) {

@@ -1,18 +1,16 @@
-package q4.mapsapp.ui.main
+package q4.mapsapp.ui.lessons
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import q4.mapsapp.R
 import q4.mapsapp.data.Lessons
 import q4.mapsapp.data.TYPE
-import q4.mapsapp.ui.lessons.LessonsFragment
+import q4.mapsapp.ui.main.BaseViewHolder
 
 class MainLessonsAdapter(
     private var onItemViewClickListener:
@@ -70,6 +68,7 @@ class MainLessonsAdapter(
                 itemView.findViewById<ShapeableImageView>(R.id.item_open_in).setOnClickListener {
                     onItemViewClickListener?.onItemViewClick()
                 }
+                itemView.findViewById<TextView>(R.id.timeline_tw).text = lessonsData.time
             }
         }
     }
@@ -84,6 +83,7 @@ class MainLessonsAdapter(
                 lessonsData.image?.let {
                     itemView.findViewById<ShapeableImageView>(R.id.item_image).setImageResource(it)
                 }
+                itemView.findViewById<TextView>(R.id.timeline_tw).text = lessonsData.time
             }
         }
     }

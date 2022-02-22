@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import q4.mapsapp.databinding.ActivityMainBinding
 import q4.mapsapp.ui.lessons.LessonsFragment
+import q4.mapsapp.ui.main.MainFragment
 
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
 

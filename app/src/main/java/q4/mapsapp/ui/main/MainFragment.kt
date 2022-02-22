@@ -1,4 +1,4 @@
-package q4.mapsapp
+package q4.mapsapp.ui.main
 
 import android.R
 import android.annotation.SuppressLint
@@ -19,10 +19,6 @@ import q4.mapsapp.data.Homework
 import q4.mapsapp.data.Lessons
 import q4.mapsapp.databinding.FragmentMainBinding
 import q4.mapsapp.ui.lessons.LessonsFragment
-import q4.mapsapp.ui.main.HomeworkAdapter
-import q4.mapsapp.ui.main.MainFragmentAppState
-import q4.mapsapp.ui.main.MainLessonsAdapter
-import q4.mapsapp.ui.main.TimerAppState
 import q4.mapsapp.viewModel.MainFragmentViewModel
 import q4.mapsapp.viewModel.TimerViewModel
 import java.text.DateFormat
@@ -64,6 +60,7 @@ class MainFragment : Fragment() {
         if (savedInstanceState == null) {
             timerViewModel.getLiveData().observe(viewLifecycleOwner, { timerData(it) })
         }
+    //    timerViewModel.getLiveData().observe(viewLifecycleOwner, { timerData(it) })
 
         binding.btnDatePicker.setOnClickListener {
             dateSetListener = setListener()
@@ -136,7 +133,7 @@ class MainFragment : Fragment() {
             LinearLayoutManager.HORIZONTAL,
             false
         )
-        val lessonsRecyclerAdapter = MainLessonsAdapter(object :
+        val lessonsRecyclerAdapter = MainFragmentLessonsAdapter(object :
             LessonsFragment.OnItemViewClickListener {
             override fun onItemViewClick() {
                 val intent: Intent? =
@@ -207,6 +204,7 @@ class MainFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) { // Here You have to save count value
         super.onSaveInstanceState(outState)
+        myCountdownView = binding.countdown
         timeElapsed = myCountdownView.remainTime
         outState.putLong(COUNT_KEY, timeElapsed)
     }
