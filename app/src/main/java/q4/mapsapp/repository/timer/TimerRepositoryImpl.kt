@@ -18,12 +18,7 @@ class TimerRepositoryImpl(
         calendar.set(Calendar.YEAR, year)
         calendar.set(Calendar.MONTH, month)
         calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-        val pickerDateString: String =
-            DateFormat.getDateInstance(DateFormat.FULL).format(calendar.time)
-
-
         try {
-
             val now = Date()
             val currentDate: Long = now.time
             val pickerDate: Long = calendar.timeInMillis
@@ -31,7 +26,6 @@ class TimerRepositoryImpl(
 
         } catch (e: Exception) {
             e.printStackTrace()
-
         }
         return countDownToPickerDate
     }

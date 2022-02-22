@@ -10,11 +10,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import cn.iwgang.countdownview.CountdownView
 import q4.mapsapp.data.Homework
 import q4.mapsapp.data.Lessons
 import q4.mapsapp.databinding.FragmentMainBinding
@@ -32,6 +32,7 @@ import java.util.*
 class MainFragment : Fragment() {
 
     companion object {
+        const val COUNT_KEY = "COUNT_KEY"
         fun newInstance() = MainFragment()
     }
 
@@ -44,6 +45,8 @@ class MainFragment : Fragment() {
     private val timerViewModel: TimerViewModel by lazy {
         ViewModelProvider(this).get(TimerViewModel::class.java)
     }
+    private lateinit var myCountdownView: CountdownView
+    private var timeElapsed: Long = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,14 +61,14 @@ class MainFragment : Fragment() {
 
         mainLessonsViewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })
         mainLessonsViewModel.getLessonsFromLocal()
-        timerViewModel.getLiveData().observe(viewLifecycleOwner, {timerData(it)})
+        if (savedInstanceState == null) {
+            timerViewModel.getLiveData().observe(viewLifecycleOwner, { timerData(it) })
+        }
 
         binding.btnDatePicker.setOnClickListener {
             dateSetListener = setListener()
-
             val datePickerDialog = initDialog()
             datePickerDialog.show()
-
         }
     }
 
@@ -114,13 +117,16 @@ class MainFragment : Fragment() {
     }
 
     private fun setTimerData(timer: Long) {
-//        val pickerDateString: String =
-//            DateFormat.getDateInstance(DateFormat.FULL).format(calendar.time)
+        val now = Date()
+        val currentDate: Long = now.time
+        val pickerDateString: String =
+            DateFormat.getDateInstance(DateFormat.FULL).format(timer + currentDate)
 
         val tvDatePicker = binding.datePickerTw
-        val myCountdownView = binding.countdown
+        tvDatePicker.text = pickerDateString
+        myCountdownView = binding.countdown
 
-            myCountdownView.start(timer)
+        myCountdownView.start(timer)
     }
 
     private fun setLessonsData(lessons: List<Lessons>, homework: List<Homework>) {
@@ -173,23 +179,6 @@ class MainFragment : Fragment() {
             calendar.set(Calendar.MONTH, month)
             calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             timerViewModel.getTimerData(year, month, dayOfMonth)
-//            val pickerDateString: String =
-//                DateFormat.getDateInstance(DateFormat.FULL).format(calendar.time)
-//
-//            val tvDatePicker = binding.datePickerTw
-//            val myCountdownView = binding.countdown
-//            try {
-//                Toast.makeText(context, "Таймер установлен!", Toast.LENGTH_SHORT).show()
-//                tvDatePicker.text = pickerDateString
-//                val now = Date()
-//                val currentDate: Long = now.time
-//                val pickerDate: Long = calendar.timeInMillis
-//                val countDownToPickerDate = pickerDate - currentDate
-//                myCountdownView.start(countDownToPickerDate)
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//                Toast.makeText(context, "Ошибка!!!!", Toast.LENGTH_SHORT).show()
-//            }
         }
 
     private fun initDialog(): DatePickerDialog {
@@ -216,4 +205,18 @@ class MainFragment : Fragment() {
         return dateFormat.format(calendar.time)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) { // Here You have to save count value
+        super.onSaveInstanceState(outState)
+        timeElapsed = myCountdownView.remainTime
+        outState.putLong(COUNT_KEY, timeElapsed)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        if (savedInstanceState !== null) {
+            timeElapsed = savedInstanceState.getLong(COUNT_KEY)
+            myCountdownView = binding.countdown
+            myCountdownView.start(timeElapsed)
+        }
+    }
 }
