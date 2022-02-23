@@ -1,12 +1,13 @@
 package q4.mapsapp.ui.lessons
 
-import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,8 +16,9 @@ import q4.mapsapp.R
 import q4.mapsapp.data.Lessons
 import q4.mapsapp.databinding.FragmentLessonsBinding
 import q4.mapsapp.viewModel.LessonsFragmentViewModel
-import java.text.SimpleDateFormat
-import java.util.*
+import android.content.ActivityNotFoundException
+import q4.mapsapp.ui.main.MainFragment
+
 
 class LessonsFragment : Fragment(R.layout.fragment_lessons) {
 
@@ -33,6 +35,7 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
     private val lessonsViewModel: LessonsFragmentViewModel by lazy {
         ViewModelProvider(this).get(LessonsFragmentViewModel::class.java)
     }
+    private val isInstalled: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,13 +80,13 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
         )
         val lessonsRecyclerAdapter = MainLessonsAdapter(object : OnItemViewClickListener {
             override fun onItemViewClick() {
-                val intent: Intent? =
-                    activity?.packageManager?.getLaunchIntentForPackage("com.whatsapp")
-                if (intent != null) {
-                    startActivity(intent)
-                }
+
+                initSkype(requireContext())
+
             }
         })
+
+
         allLessons.adapter = lessonsRecyclerAdapter
         lessonsRecyclerAdapter.setLessons(lessons)
     }
@@ -92,4 +95,36 @@ class LessonsFragment : Fragment(R.layout.fragment_lessons) {
         super.onDestroyView()
         _binding = null
     }
+
+    private fun initSkype(mContext: Context) {
+        if (!isSkypeInstalled(mContext)) {
+            goToMarket(mContext)
+            return
+        }
+
+        val skype = Intent("android.intent.action.VIEW")
+        skype.data = Uri.parse("skype:dmitryev")
+        startActivity(skype)
+        return
+
+    }
+
+    private fun isSkypeInstalled(mContext: Context): Boolean {
+        val myPackageMgr: PackageManager = mContext.packageManager
+        try {
+            myPackageMgr.getPackageInfo("com.skype.raider", PackageManager.GET_ACTIVITIES)
+        } catch (e: PackageManager.NameNotFoundException) {
+            return false
+        }
+        return true
+    }
+
+    private fun goToMarket(mContext: Context) {
+        val marketUri = Uri.parse("market://details?id=com.skype.raider")
+        val myIntent = Intent(Intent.ACTION_VIEW, marketUri)
+        myIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        mContext.startActivity(myIntent)
+        return
+    }
+
 }
