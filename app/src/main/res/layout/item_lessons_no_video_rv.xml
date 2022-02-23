@@ -25,6 +25,17 @@
         app:layout_constraintEnd_toEndOf="@+id/timeline_line"
         app:layout_constraintTop_toTopOf="@+id/timeline_line"/>
 
+    <ImageView
+        android:id="@+id/expand_timeline_circle"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/ic_expand_circle"
+        android:layout_marginTop="-2dp"
+        app:layout_constraintStart_toStartOf="@+id/timeline_line"
+        app:layout_constraintEnd_toEndOf="@+id/timeline_line"
+        app:layout_constraintTop_toTopOf="@+id/timeline_line"
+        android:visibility="visible"/>
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/timeline_tw"
         android:layout_width="wrap_content"

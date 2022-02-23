@@ -17,5 +17,6 @@
     <color name="time_text_color">#6C6E6C</color>
     <color name="item_homework_text">#38f188</color>
     <color name="timeline_color">#09F670</color>
+    <color name="expand_timeline_color">#08c2b3</color>
 
 </resources>

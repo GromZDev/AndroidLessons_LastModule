@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import q4.mapsapp.R
@@ -18,6 +20,7 @@ class MainLessonsAdapter(
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private var lessonsList: List<Lessons> = arrayListOf()
+    private var isVisible: Boolean = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -42,8 +45,8 @@ class MainLessonsAdapter(
     override fun getItemCount(): Int = lessonsList.size
 
     override fun getItemViewType(position: Int): Int {
-        return when {
-            lessonsList[position].type == TYPE.VIDEO -> TYPE_ONE
+        return when (lessonsList[position].type) {
+            TYPE.VIDEO -> TYPE_ONE
             else -> TYPE_TWO
         }
     }
@@ -57,9 +60,9 @@ class MainLessonsAdapter(
     inner class MainLessonsViewHolder(view: View) :
         BaseViewHolder(view) {
 
-
         override fun bind(lessonsData: Lessons) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
+                itemView.findViewById<ImageView>(R.id.expand_timeline_circle).visibility = View.GONE
                 itemView.findViewById<TextView>(R.id.item_name).text = lessonsData.name
                 itemView.findViewById<TextView>(R.id.item_time).text = lessonsData.time
                 lessonsData.image?.let {
@@ -69,6 +72,17 @@ class MainLessonsAdapter(
                     onItemViewClickListener?.onItemViewClick()
                 }
                 itemView.findViewById<TextView>(R.id.timeline_tw).text = lessonsData.time
+                itemView.findViewById<ConstraintLayout>(R.id.inner_view).setOnClickListener {
+                    if (isVisible) {
+                        itemView.findViewById<ImageView>(R.id.expand_timeline_circle).visibility = View.GONE
+                        itemView.findViewById<ImageView>(R.id.timeline_circle).visibility = View.VISIBLE
+                        isVisible = false
+                        return@setOnClickListener
+                    }
+                    itemView.findViewById<ImageView>(R.id.expand_timeline_circle).visibility = View.VISIBLE
+                    itemView.findViewById<ImageView>(R.id.timeline_circle).visibility = View.GONE
+                    isVisible = true
+                }
             }
         }
     }
@@ -78,12 +92,24 @@ class MainLessonsAdapter(
 
         override fun bind(lessonsData: Lessons) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
+                itemView.findViewById<ImageView>(R.id.expand_timeline_circle).visibility = View.GONE
                 itemView.findViewById<TextView>(R.id.item_name).text = lessonsData.name
                 itemView.findViewById<TextView>(R.id.item_time).text = lessonsData.time
                 lessonsData.image?.let {
                     itemView.findViewById<ShapeableImageView>(R.id.item_image).setImageResource(it)
                 }
                 itemView.findViewById<TextView>(R.id.timeline_tw).text = lessonsData.time
+                itemView.findViewById<ConstraintLayout>(R.id.inner_view).setOnClickListener {
+                    if (isVisible) {
+                        itemView.findViewById<ImageView>(R.id.expand_timeline_circle).visibility = View.GONE
+                        itemView.findViewById<ImageView>(R.id.timeline_circle).visibility = View.VISIBLE
+                        isVisible = false
+                        return@setOnClickListener
+                    }
+                    itemView.findViewById<ImageView>(R.id.expand_timeline_circle).visibility = View.VISIBLE
+                    itemView.findViewById<ImageView>(R.id.timeline_circle).visibility = View.GONE
+                    isVisible = true
+                }
             }
         }
     }
