@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">MapsApp</string>
+    <string name="ready">Готов к экзамену?</string>
+    <string name="days">Дни</string>
+    <string name="set_data">Установить дату</string>
+    <string name="main">Главная</string>
+    <string name="lessons">Уроки</string>
+    <string name="fab">FAB</string>
+    <string name="lessons_today">Уроки</string>
+    <string name="foto">Фото</string>
+    <string name="homework">Домашнее задание</string>
+    <string name="days_left">Дней осталось:</string>
+    <string name="item_img">Фото</string>
+    <string name="item_open_in">Открыть</string>
+    <string name="open_in">Открыть</string>
 </resources>

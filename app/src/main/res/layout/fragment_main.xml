@@ -1,0 +1,151 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_fragment_bg">
+
+    <TextView
+        android:id="@+id/timeWatch"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/countdown_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/top_tw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:layout_marginTop="16dp"
+        android:textSize="24sp"
+        android:text="@string/ready"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/timeWatch"
+        app:layout_constraintStart_toStartOf="@+id/timeWatch"
+        app:layout_constraintTop_toTopOf="@+id/timeWatch"/>
+
+    <cn.iwgang.countdownview.CountdownView
+        android:id="@+id/countdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="9dp"
+        android:elevation="8dp"
+        app:isHideTimeBackground="false"
+        app:isShowDay="true"
+        app:isShowHour="true"
+        app:isShowMillisecond="true"
+        app:isShowMinute="true"
+        app:isShowSecond="true"
+        app:isTimeTextBold="true"
+        app:layout_constraintEnd_toEndOf="@+id/timeWatch"
+        app:layout_constraintStart_toStartOf="@+id/timeWatch"
+        app:layout_constraintTop_toBottomOf="@+id/top_tw"
+        app:suffixDay=":"
+        app:suffixGravity="center"
+        app:suffixHour=":"
+        app:suffixMinute=":"
+        app:suffixSecond=":"
+        app:suffixTextColor="@color/white"
+        app:suffixTextSize="24sp"
+        app:timeBgColor="@color/alfa_main_bg"
+        app:timeBgRadius="8dp"
+        app:timeTextColor="#FFFFFF"
+        app:timeTextSize="32sp" />
+
+    <TextView
+        android:id="@+id/days_tw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/days"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/countdown"
+        app:layout_constraintStart_toStartOf="@+id/countdown"
+        app:layout_constraintTop_toBottomOf="@+id/countdown"/>
+
+    <TextView
+        android:id="@+id/datePicker_tw"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_margin="16dp"
+        android:layout_marginTop="16dp"
+        android:textSize="24sp"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="@+id/timeWatch"
+        app:layout_constraintStart_toStartOf="@+id/timeWatch"
+        app:layout_constraintTop_toTopOf="@+id/days_tw"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnDatePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:src="@android:drawable/ic_input_add"
+        app:fabCustomSize="52dp"
+        app:tint="@color/white"
+        android:text="@string/set_data"
+        android:textColor="#fff"
+        app:layout_constraintEnd_toEndOf="@+id/timeWatch"
+        app:layout_constraintTop_toTopOf="@+id/timeWatch"
+        android:contentDescription="@string/fab" />
+
+    <TextView
+        android:id="@+id/lessons_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/lessons_today"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/timeWatch" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/lessons_rv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:clipToPadding="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lessons_textview" />
+
+    <TextView
+        android:id="@+id/homework_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/homework"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lessons_rv" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/homeworks_rv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:clipToPadding="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/homework_textview" />
+
+    <include
+        android:id="@+id/includedLoadingLayout"
+        layout="@layout/loading_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/alfa_main_bg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
